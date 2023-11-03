@@ -119,6 +119,13 @@ bool VM::init(JavaVM* vm, bool attach) {
         _jvmti->Deallocate((unsigned char*)prop);
     }
 
+    if (!is_hotspot) {
+        if (_jvmti->GetSystemProperty("java.vm.vendor", &prop) == 0) {
+            is_hotspot = strstr(prop, "JetBrains") != NULL;
+            _jvmti->Deallocate((unsigned char*) prop);
+        }
+    }
+
     if (is_hotspot && _jvmti->GetSystemProperty("java.vm.version", &prop) == 0) {
         if (strncmp(prop, "25.", 3) == 0 && prop[3] > '0') {
             _hotspot_version = 8;
